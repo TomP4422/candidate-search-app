@@ -1,24 +1,25 @@
+const token = import.meta.env.VITE_GITHUB_TOKEN;
+console.log(token);
+
+if (!token) {
+  throw new Error('GitHub API token is missing. Check the .env file.');
+}
+
 const searchGithub = async () => {
   try {
     const start = Math.floor(Math.random() * 100000000) + 1;
-    // console.log(import.meta.env);
-    const response = await fetch(
-      `https://api.github.com/users?since=${start}`,
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
-        },
-      }
-    );
-    // console.log('Response:', response);
+    const response = await fetch(`https://api.github.com/users?since=${start}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error('invalid API response, check the network tab');
+      throw new Error(data.message || 'Invalid API response. Check the network tab.');
     }
-    // console.log('Data:', data);
     return data;
   } catch (err) {
-    // console.log('an error occurred', err);
+    console.error('Error fetching GitHub users:', err);
     return [];
   }
 };
@@ -27,17 +28,17 @@ const searchGithubUser = async (username: string) => {
   try {
     const response = await fetch(`https://api.github.com/users/${username}`, {
       headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error('invalid API response, check the network tab');
+      throw new Error(data.message || 'Invalid API response. Check the network tab.');
     }
     return data;
   } catch (err) {
-    // console.log('an error occurred', err);
-    return {};
+    console.error(`Error fetching GitHub user "${username}":`, err);
+    return null;
   }
 };
 
